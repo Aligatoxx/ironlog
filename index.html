@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <style>
 :root {
   --bg: #0a0a0a;
@@ -752,7 +752,17 @@ select { background-image: linear-gradient(45deg, transparent 50%, var(--text-di
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
+
+const SUPABASE_URL = 'https://ykfzhdpiruejothmhhtl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnpoZHBpcnVlam90aG1oaHRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTM3MDUsImV4cCI6MjA5NDc4OTcwNX0.2ilHfun_TRiOJE5Tvh10AL3Z7WqJPUJb2m94Nik-3Ps';
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
 /* =========================================================
    IRONLOG — gym tracker PWA
    ========================================================= */
