@@ -762,7 +762,13 @@ const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
+console.log("SUPABASE OK");
+console.log(supabaseClient);
 
+supabaseClient.auth.getSession()
+.then(res => {
+  console.log("SESSION TEST:", res);
+});
 /* =========================================================
    IRONLOG — gym tracker PWA
    ========================================================= */
