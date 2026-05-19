@@ -825,7 +825,74 @@ const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
+async function register(){
 
+  const email =
+    document.getElementById('auth-email').value;
+
+  const password =
+    document.getElementById('auth-password').value;
+
+  const { error } =
+    await supabaseClient.auth.signUp({
+      email,
+      password
+    });
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert('Cuenta creada');
+}
+
+async function login(){
+
+  const email =
+    document.getElementById('auth-email').value;
+
+  const password =
+    document.getElementById('auth-password').value;
+
+  const { error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  checkUser();
+}
+  document
+  .getElementById('btn-register')
+  .addEventListener('click', register);
+
+  document
+  .getElementById('btn-login')
+  .addEventListener('click', login);
+
+  async function checkUser(){
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if(session){
+
+    document
+      .getElementById('auth-screen')
+      .style.display = 'none';
+
+    console.log('USUARIO LOGUEADO');
+  }
+}
+
+checkUser();
 /* =========================================================
    IRONLOG — gym tracker PWA
    ========================================================= */
