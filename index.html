@@ -1025,13 +1025,12 @@ if(!state.data.sessions?.length){
   // ARMAR DATA
   const sessionsToInsert =
     state.data.sessions.map(session => ({
-      id: session.id,
-      user_id: user.id,
-      routine_id: session.routineId,
-      routine_name: session.routineName,
-      date: session.date,
-      exercises: session.exercises
-    }));
+    user_id: user.id,
+    routine_id: session.routineId,
+    routine_name: session.routineName,
+    date: session.date,
+    exercises: session.exercises
+  }));
 
   // INSERT
   const { error: sessionsError } =
@@ -1046,29 +1045,7 @@ if(!state.data.sessions?.length){
   }
 }
 
-// ARMAR DATA
-const sessionsToInsert =
-  state.data.sessions.map(session => ({
-    id: session.id,
-    user_id: user.id,
-    routine_id: session.routineId,
-    routine_name: session.routineName,
-    date: session.date,
-    exercises: session.exercises
-  }));
 
-// INSERT
-const { error: sessionsError } =
-  await supabaseClient
-    .from('sessions')
-    .insert(sessionsToInsert);
-
-if(sessionsError){
-  console.error("SESSIONS INSERT ERROR:", sessionsError);
-} else {
-  console.log("SESSIONS CLOUD SAVED");
-}
-}
 async function loadCloudData(){
 
   const {
@@ -1683,7 +1660,7 @@ $('#btn-finish-training').addEventListener('click', () => {
   cancelTraining();
 });
 
-function finishTraining() {
+async function finishTraining() {
   const t = state.training;
   // Build session: only sets with weight or reps loaded
   const exercises = t.exerciseStates.map(ex => {
@@ -1712,7 +1689,7 @@ function finishTraining() {
     exercises
   };
   state.data.sessions.push(session);
-  saveData();
+  await saveData();
   state.training = null;
   $('#training-shell').classList.remove('active');
   toast('Sesión guardada ✓');
