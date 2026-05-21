@@ -833,20 +833,32 @@ async function register(){
   const password =
     document.getElementById('auth-password').value;
 
-  const { error } =
-    await supabaseClient.auth.signUp({
-      email,
-      password
-    });
+  console.log("EMAIL:", email);
+  console.log("PASSWORD:", password);
 
-  if(error){
-    alert(error.message);
-    return;
+  try {
+
+    const response =
+      await supabaseClient.auth.signUp({
+        email: email,
+        password: password
+      });
+
+    console.log(response);
+
+    if(response.error){
+      alert(response.error.message);
+      return;
+    }
+
+    alert('Cuenta creada correctamente');
+
+  } catch(err){
+
+    console.error(err);
+    alert('ERROR');
   }
-
-  alert('Cuenta creada');
 }
-
 async function login(){
 
   const email =
