@@ -877,6 +877,7 @@ async function login(){
     alert(error.message);
     return;
   }
+  await loadCloudData();
 
   checkUser();
 }
@@ -904,6 +905,26 @@ async function login(){
   }
 }
 
+supabaseClient.auth.onAuthStateChange(
+  async (event, session) => {
+
+    if(session){
+
+      document
+        .getElementById('auth-screen')
+        .style.display = 'none';
+
+      await loadCloudData();
+
+    } else {
+
+      document
+        .getElementById('auth-screen')
+        .style.display = 'flex';
+    }
+  }
+);
+
 checkUser();
 /* =========================================================
    IRONLOG — gym tracker PWA
@@ -926,10 +947,100 @@ function loadData() {
     return { ...defaultData(), ...parsed };
   } catch(e) { return defaultData(); }
 }
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-}
+async function saveData() {
 
+  // LOCAL
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(state.data)
+  );
+
+  // USER
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if(!user) return;
+
+  // BORRAR CLOUD ANTERIOR
+  const { error: deleteError } =
+    await supabaseClient
+      .from('routines')
+      .delete()
+      .eq('user_id', user.id);
+
+  if(deleteError){
+    console.error(deleteError);
+    return;
+  }
+
+  // SI NO HAY RUTINAS
+  if(!state.data.routines?.length){
+    return;
+  }
+
+  // ARMAR DATA
+  const routinesToInsert =
+    state.data.routines.map(routine => ({
+      user_id: user.id,
+      name: routine.name,
+      day: routine.day,
+      exercises: routine.exercises
+    }));
+
+  // INSERT
+  const { error } =
+    await supabaseClient
+      .from('routines')
+      .insert(routinesToInsert);
+
+  if(error){
+    console.error(error);
+  } else {
+    console.log('CLOUD SAVED');
+  }
+}
+async function loadCloudData(){
+
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if(!user) return;
+
+  const { data, error } =
+    await supabaseClient
+      .from('routines')
+      .select('*')
+      .eq('user_id', user.id);
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  if(!data || data.length === 0){
+    console.log('NO CLOUD ROUTINES');
+    return;
+  }
+
+  state.data.routines = data.map(r => ({
+    id: r.id,
+    name: r.name,
+    day: r.day,
+    exercises: r.exercises
+  }));
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(state.data)
+  );
+
+  render();
+
+  console.log('CLOUD LOADED');
+}
+  
 // ---------- STATE ----------
 const state = {
   data: loadData(),
