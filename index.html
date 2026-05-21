@@ -1020,7 +1020,30 @@ if(deleteSessionsError){
 // SI NO HAY SESIONES
 if(!state.data.sessions?.length){
   console.log('NO SESSIONS');
-  return;
+} else {
+
+  // ARMAR DATA
+  const sessionsToInsert =
+    state.data.sessions.map(session => ({
+      id: session.id,
+      user_id: user.id,
+      routine_id: session.routineId,
+      routine_name: session.routineName,
+      date: session.date,
+      exercises: session.exercises
+    }));
+
+  // INSERT
+  const { error: sessionsError } =
+    await supabaseClient
+      .from('sessions')
+      .insert(sessionsToInsert);
+
+  if(sessionsError){
+    console.error("SESSIONS INSERT ERROR:", sessionsError);
+  } else {
+    console.log("SESSIONS CLOUD SAVED");
+  }
 }
 
 // ARMAR DATA
@@ -1046,7 +1069,6 @@ if(sessionsError){
   console.log("SESSIONS CLOUD SAVED");
 }
 }
-
 async function loadCloudData(){
 
   const {
@@ -1123,39 +1145,8 @@ async function loadCloudData(){
 
   console.log('CLOUD LOADED');
 }
+
   
-  const {
-  data: sessionsData,
-  error: sessionsError
-} = await supabaseClient
-  .from('sessions')
-  .select('*')
-  .eq('user_id', user.id);
-
-if(sessionsError){
-  console.error(sessionsError);
-} else {
-
-  state.data.sessions =
-    sessionsData.map(session => ({
-      id: session.id,
-      routineId: session.routine_id,
-      routineName: session.routine_name,
-      date: session.date,
-      exercises: session.exercises
-    }));
-
-  console.log('SESSIONS LOADED');
-}
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(state.data)
-  );
-
-  render();
-
-  console.log('CLOUD LOADED');
-}
   
 // ---------- STATE ----------
 const state = {
