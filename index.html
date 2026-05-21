@@ -1077,7 +1077,30 @@ async function loadCloudData(){
     day: r.day,
     exercises: r.exercises
   }));
+  
+  const {
+  data: sessionsData,
+  error: sessionsError
+} = await supabaseClient
+  .from('sessions')
+  .select('*')
+  .eq('user_id', user.id);
 
+if(sessionsError){
+  console.error(sessionsError);
+} else {
+
+  state.data.sessions =
+    sessionsData.map(session => ({
+      id: session.id,
+      routineId: session.routine_id,
+      routineName: session.routine_name,
+      date: session.date,
+      exercises: session.exercises
+    }));
+
+  console.log('SESSIONS LOADED');
+}
   localStorage.setItem(
     STORAGE_KEY,
     JSON.stringify(state.data)
